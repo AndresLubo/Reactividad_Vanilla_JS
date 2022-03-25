@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado inmutable</title>
+</head>
+
+<body>
+    <h1>Estado inmutable</h1>
+    <form id="todo-form">
+        <input type="text" name="" id="todo-item" placeholder="Tarea por hacer" autocomplete="off">
+        <input type="submit" value="Agregar">
+    </form>
+
+    <h2>Lista de tareas</h2>
+    <ul id="todo-list"></ul>
+
+    <script>
+        const d = document;
+
+        // El state
+        const state = {
+            todoList: [],
+            nombre: ""
+        }
+
+        // Template UI
+        const template = () => {
+            if (state.todoList.length < 1) return `<p><em>Lista sin tareas</em></p>`;
+            let todos = state.todoList.map(item => `<li>${item}</li>`).join("");
+
+            return todos;
+        }
+
+        // Render UI
+        const render = () => {
+            console.log(state);
+            const $list = d.getElementById("todo-list");
+            if (!$list) return;
+
+            $list.innerHTML = template();
+        }
+
+        //Actualizar el estado
+        const setState = (object) => {
+            for (let key in object) {
+                if (state.hasOwnProperty(key)) {
+                    state[key] = object[key];
+                }
+            }
+
+            render();
+        }
+
+        const getState = () => JSON.parse(JSON.stringify(state));
+
+        d.addEventListener("DOMContentLoaded", render)
+
+        //Estableciendo valores por defecto al state
+        setState({
+            todoList: ["Tarea 1", "Tarea 2", "Tarea 3"],
+            nombre: "Andres",
+        })
+
+
+        // const item = state.todoList;
+        // item.push("Tarea 4");
+        const item = getState();
+        item.todoList.push("Tarea 4");
+
+        d.addEventListener("submit", e => {
+            if (!e.target.matches("#todo-form")) return false;
+
+            e.preventDefault();
+
+            const $item = d.getElementById("todo-item");
+            if (!$item) return;
+
+            //Actualizar el state y la UI 
+            //Actualizar el estado de forma reactiva e inmutable
+            const data = getState();
+            data.todoList.push($item.value);
+            setState({
+                todoList: data.todoList
+            });
+
+            $item.value = "";
+            $item.focus();
+        })
+    </script>
+</body>
+
+</html>
